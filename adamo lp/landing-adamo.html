@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Implementação MAP — Ádamo Peçanha</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #000000;
+  --white: #ffffff;
+  --gray: #a1a1a1;
+  --gray-dim: rgba(161,161,161,0.4);
+  --gray-mid: rgba(161,161,161,0.5);
+  --gray-low: rgba(161,161,161,0.3);
+  --gray-faint: rgba(161,161,161,0.7);
+  --card-bg: #1f1f1f;
+  --inner-bg: #000000;
+  --page-max: 680px;
+  --page-pad: 32px;
+}
+
+html { background: #000; }
+
+body {
+  background: #000;
+  color: var(--white);
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.page-wrap { max-width: 1920px; margin: 0 auto; }
+
+.section-inner {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 0 var(--page-pad);
+}
+
+hr.sep {
+  border: none;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  margin: 0;
+}
+
+/* ── HERO ── */
+.hero { padding: 80px 0 64px; text-align: center; }
+
+.hero .eyebrow {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 400;
+  font-size: 10px;
+  color: var(--gray);
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.hero .brand {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--white);
+  letter-spacing: 0.08em;
+  display: block;
+  margin-bottom: 40px;
+}
+
+.hero-avatar-wrap {
+  width: 160px;
+  height: 160px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 50%;
+  margin: 0 auto 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #111;
+}
+
+.hero-avatar-placeholder {
+  width: 158px;
+  height: 158px;
+  border-radius: 50%;
+  background: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.hero-avatar-placeholder img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-avatar-placeholder svg {
+  width: 64px;
+  height: 64px;
+  opacity: 0.2;
+}
+
+.hero h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: clamp(36px, 7vw, 53.8px);
+  line-height: 1.1;
+  color: var(--white);
+  max-width: 560px;
+  margin: 0 auto 16px;
+  letter-spacing: -0.01em;
+}
+
+.hero .hero-sub {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: clamp(20px, 3vw, 28px);
+  color: var(--white);
+  max-width: 700px;
+  margin: 0 auto 16px;
+  line-height: 1.2;
+}
+
+.hero-desc {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--gray);
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+/* ── STATS ── */
+.stats-section { padding: 64px 0; }
+
+.stats-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 400;
+  font-size: 11px;
+  color: var(--gray);
+  text-align: center;
+  display: block;
+  margin-bottom: 32px;
+}
+
+.stats-grid {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+  max-width: 580px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+}
+
+.stat-col {
+  flex: 1;
+  min-width: 120px;
+  text-align: center;
+  padding: 0 20px;
+  position: relative;
+}
+
+.stat-col + .stat-col::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 4px;
+  height: calc(100% - 8px);
+  width: 1px;
+  background: rgba(255,255,255,0.08);
+}
+
+.stat-val {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 26px;
+  color: var(--white);
+  display: block;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.stat-lbl {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 400;
+  font-size: 11px;
+  color: var(--gray);
+  line-height: 1.4;
+}
+
+/* ── SECTION ── */
+.section { padding: 80px 0; }
+
+.sec-eyebrow {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 400;
+  font-size: 10px;
+  color: var(--gray);
+  text-align: center;
+  display: block;
+  margin-bottom: 48px;
+}
+
+.sec-h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: clamp(24px, 4vw, 32px);
+  line-height: 1.18;
+  color: var(--white);
+  margin-bottom: 20px;
+  letter-spacing: -0.01em;
+}
+
+.sec-lead {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--gray);
+  margin-bottom: 32px;
+}
+
+/* ── PROBLEMS GRID ── */
+.problems-bg {
+  background: var(--card-bg);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.problem-cell {
+  background: var(--inner-bg);
+  padding: 20px 24px 24px;
+  border-right: 1px solid var(--card-bg);
+  border-bottom: 1px solid var(--card-bg);
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.problem-dash {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--gray);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.problem-text {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--gray);
+  line-height: 1.55;
+}
+
+.diag-conclusion {
+  margin-top: 24px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: var(--white);
+  line-height: 1.5;
+}
+
+/* ── STORY ── */
+.story-body p {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 16px;
+  color: var(--gray);
+  line-height: 1.65;
+  margin-bottom: 22px;
+}
+
+.story-body p.highlight {
+  color: var(--white);
+  font-weight: 400;
+}
+
+.story-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: rgba(255,255,255,0.08);
+  margin: 28px 0;
+}
+
+.story-col {
+  background: #000;
+  padding: 28px 24px;
+}
+
+.story-col-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gray);
+  margin-bottom: 16px;
+  display: block;
+}
+
+.story-col ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.story-col ul li {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 14px;
+  color: var(--gray);
+  line-height: 1.55;
+  padding-left: 16px;
+  position: relative;
+}
+
+.story-col ul li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--gray);
+  font-size: 12px;
+}
+
+/* ── PILLARS ── */
+.pillars-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--gray);
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.pillars-divider-line {
+  width: 1px;
+  height: 24px;
+  background: rgba(161,161,161,0.4);
+  margin: 0 auto 24px;
+}
+
+.pillars-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  flex-wrap: wrap;
+}
+
+.pillar-box {
+  border: 1px solid rgba(255,255,255,0.12);
+  width: 144px;
+  height: 144px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  flex-shrink: 0;
+  padding: 12px;
+}
+
+.pillar-letter {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 28px;
+  color: var(--white);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.pillar-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--white);
+  text-align: center;
+  line-height: 1.4;
+}
+
+.pillar-sub {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 11px;
+  color: var(--gray);
+  text-align: center;
+  line-height: 1.4;
+  margin-top: 4px;
+}
+
+.pillar-plus {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  color: var(--gray);
+  padding: 0 20px;
+}
+
+.pillars-tag {
+  text-align: center;
+  margin-top: 32px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gray);
+}
+
+.pillars-body { margin-top: 40px; }
+
+.pillars-body p {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 16px;
+  color: var(--gray);
+  line-height: 1.65;
+  margin-bottom: 16px;
+}
+
+.pillars-body p strong { color: var(--white); font-weight: 400; }
+
+/* ── STEPS ── */
+.step-row {
+  padding: 32px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+.step-row:first-child { border-top: 1px solid rgba(255,255,255,0.08); }
+
+.step-num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 400;
+  font-size: 11px;
+  color: rgba(161,161,161,0.4);
+  flex-shrink: 0;
+  width: 28px;
+  padding-top: 2px;
+}
+
+.step-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--white);
+  margin-bottom: 10px;
+}
+
+.step-desc {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 14px;
+  color: rgba(161,161,161,0.7);
+  line-height: 1.65;
+}
+
+.step-sub-list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.step-sub-list span {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 13px;
+  color: rgba(161,161,161,0.6);
+  line-height: 1.55;
+  padding-left: 14px;
+  position: relative;
+}
+
+.step-sub-list span::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: rgba(161,161,161,0.4);
+  font-size: 11px;
+}
+
+.steps-outro {
+  margin-top: 32px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 15px;
+  color: rgba(161,161,161,0.6);
+  line-height: 1.65;
+}
+
+/* ── TRANSFORMATION ── */
+.transform-row {
+  display: flex;
+  gap: 40px;
+  margin-top: 32px;
+  flex-wrap: wrap;
+}
+
+.transform-col { flex: 1; min-width: 200px; }
+
+.transform-col-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gray);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.transform-col-label .icon { font-size: 14px; }
+
+.transform-col ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.transform-col ul li {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 14px;
+  color: var(--gray);
+  line-height: 1.55;
+  padding-left: 20px;
+  position: relative;
+}
+
+.transform-col ul li::before {
+  position: absolute;
+  left: 0;
+}
+
+.transform-col.negative ul li::before { content: '❌'; font-size: 11px; top: 2px; }
+.transform-col.positive ul li { color: var(--white); }
+.transform-col.positive ul li::before { content: '✅'; font-size: 11px; top: 2px; }
+
+/* ── QUAL LIST ── */
+.qual-item {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.qual-item:first-child { border-top: 1px solid rgba(255,255,255,0.06); }
+
+.qual-arrow {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 12px;
+  color: var(--white);
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.qual-text {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 15px;
+  color: rgba(161,161,161,0.8);
+  line-height: 1.6;
+}
+
+.not-for-box {
+  margin-top: 28px;
+  background: rgba(240,68,68,0.05);
+  border: 1px solid rgba(240,68,68,0.12);
+  padding: 24px 21px;
+}
+
+.not-for-box p {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.65;
+}
+
+.not-for-box strong { font-weight: 600; }
+
+/* ── WHAT YOU GET ── */
+.get-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 32px;
+}
+
+.get-item {
+  padding: 24px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.get-item:first-child { border-top: 1px solid rgba(255,255,255,0.06); }
+
+.get-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--white);
+  margin-bottom: 8px;
+}
+
+.get-desc {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 14px;
+  color: rgba(161,161,161,0.7);
+  line-height: 1.65;
+}
+
+.value-total {
+  margin-top: 40px;
+  text-align: center;
+  padding: 32px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.value-total-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gray);
+  display: block;
+  margin-bottom: 12px;
+}
+
+.value-total-num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 48px;
+  color: var(--white);
+  line-height: 1;
+}
+
+.value-total-sub {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: var(--gray);
+  margin-top: 16px;
+  line-height: 1.6;
+}
+
+/* ── PRICE ── */
+.price-section { padding: 80px 0; text-align: center; }
+
+.price-main {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: clamp(60px, 14vw, 95px);
+  color: var(--white);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin: 24px 0 16px;
+}
+
+.price-installment {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 15px;
+  color: var(--gray);
+  margin-bottom: 24px;
+}
+
+.price-note {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 15px;
+  color: rgba(161,161,161,0.5);
+  line-height: 1.7;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+/* ── ENTRY STEPS ── */
+.entry-row {
+  display: flex;
+  gap: 28px;
+  padding: 28px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  align-items: flex-start;
+}
+
+.entry-row:first-child { border-top: 1px solid rgba(255,255,255,0.06); }
+
+.entry-num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 400;
+  font-size: 11px;
+  color: rgba(161,161,161,0.4);
+  flex-shrink: 0;
+  width: 28px;
+  padding-top: 2px;
+}
+
+.entry-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--white);
+  margin-bottom: 8px;
+}
+
+.entry-desc {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 14px;
+  color: rgba(161,161,161,0.7);
+  line-height: 1.65;
+}
+
+/* ── CTA ── */
+.cta-section { padding: 64px 0; text-align: center; }
+
+.cta-note {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 15px;
+  color: rgba(161,161,161,0.5);
+  margin-bottom: 40px;
+}
+
+.btn-apply {
+  display: inline-block;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: #090909;
+  background: #ffffff;
+  padding: 16px 60px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.btn-apply:hover { opacity: 0.88; transform: translateY(-1px); }
+
+/* ── PHILOSOPHY ── */
+.philosophy-section { padding: 64px 0 40px; text-align: center; }
+
+.philosophy-quote {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  color: var(--white);
+  line-height: 1.65;
+  max-width: 400px;
+  margin: 0 auto 48px;
+}
+
+/* ── CASES / LINKS ── */
+.cases-grid {
+  column-count: 3;
+  column-gap: 3px;
+  margin-top: 40px;
+}
+
+.case-placeholder {
+  display: block;
+  margin-bottom: 3px;
+  break-inside: avoid;
+  background: #111;
+}
+
+.case-placeholder img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.case-placeholder span {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.15);
+  text-transform: uppercase;
+}
+
+/* ── PS ── */
+.ps-section { padding: 48px 0 64px; }
+
+.ps-text {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.65;
+}
+
+.ps-text a { color: rgba(255,255,255,0.7); text-decoration: underline; text-underline-offset: 3px; }
+
+/* ── FOOTER ── */
+.footer {
+  padding: 32px 0;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  text-align: center;
+}
+
+.footer p {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(161,161,161,0.3);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+  :root { --page-pad: 20px; }
+  .section { padding: 48px 0; }
+  .hero { padding: 48px 0 40px; }
+  .hero-avatar-wrap { width: 120px; height: 120px; margin-bottom: 32px; }
+  .hero-avatar-placeholder { width: 118px; height: 118px; }
+  
+  .stats-grid { flex-wrap: wrap; }
+  .stat-col { min-width: 50%; margin-bottom: 24px; padding: 0 10px; }
+  .stat-col + .stat-col::before { display: none; }
+  .stat-val { font-size: 22px; }
+  
+  .problems-bg { grid-template-columns: 1fr; }
+  .story-two-col { grid-template-columns: 1fr; }
+  
+  .pillars-row { flex-direction: column; gap: 12px; }
+  .pillar-plus { transform: rotate(90deg); padding: 8px 0; }
+  .pillar-box { width: 100%; height: auto; padding: 24px; }
+  
+  .step-row { gap: 16px; flex-direction: column; }
+  .step-num { width: auto; padding-bottom: 4px; }
+  
+  .transform-row { flex-direction: column; gap: 24px; }
+  
+  .btn-apply { width: 100%; padding: 16px 20px; text-align: center; }
+  
+  .cases-grid { column-count: 2; }
+}
+
+/* ── SCROLL REVEAL ── */
+.reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.65s ease, transform 0.65s ease; }
+.reveal.in { opacity: 1; transform: none; }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <!-- ── HERO ── -->
+  <section class="hero section-inner">
+    <span class="eyebrow">Leia antes de aplicar</span>
+    <span class="brand">Ádamo Peçanha</span>
+
+    <div class="hero-avatar-wrap">
+      <div class="hero-avatar-placeholder">
+        <img src="imgi_2_655764252_18576615754046672_4367312689065366470_n.jpeg" alt="Ádamo Peçanha">
+      </div>
+    </div>
+
+    <p class="eyebrow" style="margin-bottom:12px;">IMPLEMENTAÇÃO MAP</p>
+    <h1>Você tem conhecimento.</h1>
+    <p class="hero-sub">
+      <span style="display: inline-block;">É melhor do que muito profissional da sua área…</span><br>
+      <span style="display: inline-block;">Mas sua conta bancária ainda não reflete isso.</span>
+    </p>
+    <p class="hero-desc">O problema não é você. É o seu modelo.</p>
+  </section>
+
+  <hr class="sep">
+
+  <!-- ── DIAGNÓSTICO ── -->
+  <section class="section section-inner reveal">
+    <span class="sec-eyebrow">O diagnóstico</span>
+    <h2 class="sec-h2">Você tem conhecimento e uma história forte. O problema está na hora de comunicar e vender o seu valor.</h2>
+    <p class="sec-lead">Você já vende. Recebe indicação. Elogiam o seu trabalho. Mas…</p>
+
+    <div class="problems-bg">
+      <div class="problem-cell">
+        <span class="problem-dash">→</span>
+        <span class="problem-text">Você trabalha muito mas seu faturamento não cresce no mesmo ritmo (estagnou).</span>
+      </div>
+      <div class="problem-cell">
+        <span class="problem-dash">→</span>
+        <span class="problem-text">Monetização digital fraca: você ainda não tem uma fonte de renda escalável, previsível e abundante.</span>
+      </div>
+      <div class="problem-cell">
+        <span class="problem-dash">→</span>
+        <span class="problem-text">Esgotamento: você cobra a média do mercado, entrega muito e se sobrecarrega.</span>
+      </div>
+      <div class="problem-cell">
+        <span class="problem-dash">→</span>
+        <span class="problem-text">Trava na hora de vender — sabe do valor que entrega, mas não consegue comunicar isso com clareza e confiança.</span>
+      </div>
+      <div class="problem-cell">
+        <span class="problem-dash">→</span>
+        <span class="problem-text">Você posta, cria conteúdo, aparece… mas não atrai clientes prontos para comprar.</span>
+      </div>
+      <div class="problem-cell">
+        <span class="problem-dash">→</span>
+        <span class="problem-text">Você sente que está abaixo do seu potencial — e sabe que está na hora de destravar isso.</span>
+      </div>
+    </div>
+
+    <p class="diag-conclusion">Você já tem potencial. Mas falta estrutura, clareza e estratégia.</p>
+  </section>
+
+  <hr class="sep">
+
+  <!-- ── HISTÓRIA ── -->
+  <section class="section section-inner reveal">
+    <span class="sec-eyebrow">Você está no lugar certo…</span>
+    <h2 class="sec-h2">Eu já vivi os dois mundos:</h2>
+
+    <div class="story-two-col">
+      <div class="story-col">
+        <span class="story-col-label">Empreendedor workaholic</span>
+        <ul>
+          <li>R$50 mil/mês de pró-labore</li>
+          <li>Empresa física</li>
+          <li>Equipe grande pra treinar</li>
+          <li>80 horas de trabalho/semana, sem liberdade</li>
+        </ul>
+      </div>
+      <div class="story-col">
+        <span class="story-col-label">Propósito sem renda</span>
+        <ul>
+          <li>Autoconhecimento, desenvolvimento pessoal</li>
+          <li>Primeiro produto sobre "propósito"</li>
+          <li>Fez um lançamento, soltou o link… quase ninguém comprou</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="story-body">
+      <p>Em 2017, tive um burnout, vendi meu negócio e fui para o outro extremo: autoconhecimento, desenvolvimento pessoal, psicologia positiva…</p>
+      <p>Entrei no digital em 2018, criei meu primeiro produto sobre "propósito" e "expansão da consciência". Fiz um lançamento, soltei o link… quase ninguém comprou.</p>
+      <p>"Gostei muito Ádamo, mas não vou entrar agora."</p>
+      <p>Foi quando uma chave virou na minha cabeça e eu pensei:</p>
+      <p class="highlight">Eu não vou viver do meu propósito se eu não dominar essa merd@ de marketing digital.</p>
+      <p>Mergulhei de cabeça. Fiquei obcecado pelo assunto e dediquei os últimos 7 anos da minha vida — e mais de meio milhão (R$500.000) em mentorias… para entender como viver do meu propósito.</p>
+      <p>Os mentores de marketing não entendem o nosso mundo. E 99% dos mentores de desenvolvimento pessoal não sabem fazer dinheiro.</p>
+      <p>Eu vivi os dois. E isso me obrigou a criar um MÉTODO ÚNICO.</p>
+      <p class="highlight">O modelo que vivo (e ensino) até hoje. 7 anos depois.</p>
+      <p>Um modelo onde o seu conhecimento em desenvolvimento pessoal vira um negócio digital que gera R$30k, R$50k, R$100k+ por mês. Trabalhando de 3h a 4h por dia, de segunda a sexta.</p>
+      <p>Apliquei em mim. Apliquei em mais de 250 mentorados.</p>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-section" style="padding: 40px 0 0;">
+      <div class="stats-grid">
+        <div class="stat-col">
+          <span class="stat-val">+R$200k</span>
+          <span class="stat-lbl">por mês com meu propósito</span>
+        </div>
+        <div class="stat-col">
+          <span class="stat-val">+R$20MM</span>
+          <span class="stat-lbl">gerados para mentorados</span>
+        </div>
+        <div class="stat-col">
+          <span class="stat-val">+600 mil</span>
+          <span class="stat-lbl">seguidores</span>
+        </div>
+        <div class="stat-col">
+          <span class="stat-val">3h–4h</span>
+          <span class="stat-lbl">trabalho/dia, seg a sex</span>
+        </div>
+      </div>
+      <p style="text-align:center; margin-top:20px; font-family:'Inter',sans-serif; font-weight:300; font-size:13px; color:rgba(161,161,161,0.5);">Moro em Floripa e vivo uma vida que amo, todos os dias</p>
+    </div>
+
+    <div class="story-body" style="margin-top:32px;">
+      <p>Funciona porque não é marketing genérico aplicado no seu nicho. É um método construído por quem vive de desenvolvimento pessoal há uma década.</p>
+      <p class="highlight">Estruturei o método em 3 pilares.</p>
+    </div>
+
+    <!-- PILARES MAP -->
+    <div style="margin-top: 48px;">
+      <div class="pillars-row">
+        <div class="pillar-box">
+          <span class="pillar-letter">M</span>
+          <span class="pillar-label">Mensagem</span>
+          <span class="pillar-sub">Posicionamento claro e vendável.</span>
+        </div>
+        <span class="pillar-plus">→</span>
+        <div class="pillar-box">
+          <span class="pillar-letter">A</span>
+          <span class="pillar-label">Ativos digitais</span>
+          <span class="pillar-sub">Produtos de alto valor (R$3k a R$5k).</span>
+        </div>
+        <span class="pillar-plus">→</span>
+        <div class="pillar-box">
+          <span class="pillar-letter">P</span>
+          <span class="pillar-label">Público</span>
+          <span class="pillar-sub">Atrair clientes e vender com confiança.</span>
+        </div>
+      </div>
+      <p class="pillars-tag" style="margin-top:28px;">Esse é o "90/10" do digital.</p>
+    </div>
+
+    <div class="pillars-body">
+      <p>90% do seu sucesso aqui é resultado direto desses 3 pilares bem estruturados.</p>
+      <p>Sem isso? Você continua com muito conhecimento, sem ser pago o quanto merece.</p>
+      <p><strong>É por isso que me pagam R$20.000 por mentoria para implementar esse passo a passo. Recebe pronto. Aplica. E faz 10x mais depois.</strong></p>
+      <p>Você pode receber o mesmo. Eu já errei por você. Agora eu te passo o atalho.</p>
+    </div>
+  </section>
+
+  <hr class="sep">
+
+  <!-- ── IMPLEMENTAÇÃO MAP ── -->
+  <section class="section section-inner reveal">
+    <span class="sec-eyebrow">Implementação MAP</span>
+    <h2 class="sec-h2">Implementação de 21 dias — Acompanhamento 1:1 — Comunidade Próspera</h2>
+    <p class="sec-lead">Não é mentoria de marketing. Não é curso gravado. É implementação estratégica.<br><br>Você chega, eu identifico os problemas, a gente traça o plano de ação e implementamos juntos. Depois, você me tem como seu "sócio" para acompanhar e fazer ajustes durante 6 meses.</p>
+
+    <div>
+      <div class="step-row">
+        <span class="step-num">01</span>
+        <div>
+          <p class="step-title">Diagnóstico — primeiros 7 dias</p>
+          <p class="step-desc">Eu, Ádamo, vou olhar para o teu projeto (1:1) assim que você entrar. Identifico os problemas de posicionamento, comunicação, oferta, conteúdo, aquisição de clientes e traçamos o plano de implementação de 21 dias.</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <span class="step-num">02</span>
+        <div>
+          <p class="step-title">Mensagem — primeiros 7 dias</p>
+          <p class="step-desc">Aqui é onde você ganha clareza do seu posicionamento digital. Transformamos todo o seu conhecimento, experiência e história em uma mensagem vendável, autêntica e impossível de ignorar.</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <span class="step-num">03</span>
+        <div>
+          <p class="step-title">Ativos digitais — primeiros 14 dias</p>
+          <p class="step-desc">Aqui nós transformamos sua mensagem em um produto digital de alto valor (R$3.000 até R$50.000+). Você sai com uma oferta pronta para receber o pix: promessa, entregáveis, formato, narrativa e apresentação.</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <span class="step-num">04</span>
+        <div>
+          <p class="step-title">Público — primeiros 21 dias</p>
+          <p class="step-desc">Por último, vamos implementar um funil para atrair e converter estranhos em clientes prontos para pagar caro pela sua solução.</p>
+          <div class="step-sub-list">
+            <span>Estrutura de perfil (vitrine digital)</span>
+            <span>Estratégia de conteúdo</span>
+            <span>Geração de leads qualificados</span>
+            <span>Condução e fechamento de vendas</span>
+          </div>
+        </div>
+      </div>
+      <div class="step-row">
+        <span class="step-num">🎁</span>
+        <div>
+          <p class="step-title">Bônus</p>
+          <p class="step-desc">Acesso a todos os meus recursos, eventos presenciais e programas avançados gravados durante os 6 meses que você estiver na mentoria.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRANSFORMAÇÃO -->
+    <div class="transform-row">
+      <div class="transform-col negative">
+        <span class="transform-col-label"><span class="icon">❌</span> Você entra sem:</span>
+        <ul>
+          <li>Clareza</li>
+          <li>Estrutura</li>
+          <li>Estratégia</li>
+        </ul>
+      </div>
+      <div class="transform-col positive">
+        <span class="transform-col-label"><span class="icon">✅</span> Em 21 dias você já tem:</span>
+        <ul>
+          <li>Posicionamento magnético</li>
+          <li>Programa de mentoria estruturado para vender e entregar</li>
+          <li>Os primeiros clientes high-ticket (de R$3.000 a R$5.000)</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="steps-outro" style="margin-top:32px;">Agora você tem uma mensagem clara, uma oferta validada e um sistema de vendas da sua mentoria.<br><br><strong style="color:var(--white); font-style:normal;">Implementação de 21 dias — Acompanhamento 1:1 — Comunidade Próspera</strong></p>
+  </section>
+
+  <hr class="sep">
+
+  <!-- ── PARA QUEM É ── -->
+  <section class="section section-inner reveal">
+    <span class="sec-eyebrow">Leia antes de continuar</span>
+    <h2 class="sec-h2">A Implementação só vai fazer sentido se:</h2>
+
+    <div style="margin-top: 24px;">
+      <div class="qual-item">
+        <span class="qual-arrow">→</span>
+        <span class="qual-text">Você é psicólogo, terapeuta, constelador, nutri, personal ou um profissional que vende desenvolvimento pessoal, autoconhecimento e bem-estar.</span>
+      </div>
+      <div class="qual-item">
+        <span class="qual-arrow">→</span>
+        <span class="qual-text">Você já tem experiência e resultados comprovados, mas trava na hora de vender.</span>
+      </div>
+      <div class="qual-item">
+        <span class="qual-arrow">→</span>
+        <span class="qual-text">Você já fatura +R$10k/mês, mas não consegue escalar.</span>
+      </div>
+      <div class="qual-item">
+        <span class="qual-arrow">→</span>
+        <span class="qual-text">Você já está minimamente posicionado, mas sua comunicação não vende como você gostaria.</span>
+      </div>
+      <div class="qual-item">
+        <span class="qual-arrow">→</span>
+        <span class="qual-text">Você tem ambição de fazer R$30k, R$50k até R$100k+ com o seu conhecimento — de forma leve.</span>
+      </div>
+    </div>
+
+    <div class="not-for-box">
+      <p><strong>Não é para você</strong> que ainda não tem um conhecimento para vender.</p>
+    </div>
+  </section>
+
+  <hr class="sep">
+
+  <!-- ── O QUE VOCÊ RECEBE ── -->
+  <section class="section section-inner reveal">
+    <span class="sec-eyebrow">O que você recebe?</span>
+    <h2 class="sec-h2">10 vagas para esse grupo. Número limitado. Acompanhamento real.</h2>
+
+    <div class="get-list">
+      <div class="get-item">
+        <p class="get-title">Implementação prática (1:1)</p>
+        <p class="get-desc">Eu, Ádamo Peçanha, implemento com você os 3 pilares (Mensagem, Ativos digitais e Público). Em 21 dias você tem tudo pronto.</p>
+      </div>
+      <div class="get-item">
+        <p class="get-title">Acompanhamento semanal (em grupo)</p>
+        <p class="get-desc">Todas as semanas, terça-feira, eu entro em call com todos mentorados para olhar o seu projeto 1:1 e fazer ajustes necessários.</p>
+      </div>
+      <div class="get-item">
+        <p class="get-title">Acesso ao meu WhatsApp individual</p>
+        <p class="get-desc">Você vai me ter como seu "sócio" para resolver problemas pontuais durante o processo.</p>
+      </div>
+      <div class="get-item">
+        <p class="get-title">Sprint caixa rápido</p>
+        <p class="get-desc">Estratégia para você recuperar o seu investimento no MAP nos primeiros 14 dias. Vendendo sua nova solução para quem é ou já foi seu cliente. Zero investimento e aplicação rápida.</p>
+      </div>
+      <div class="get-item">
+        <p class="get-title">Todos os meus programas avançados</p>
+        <p class="get-desc">Minha metodologia gravada para mentores. Mentoria de mentalidade e alta performance.</p>
+      </div>
+      <div class="get-item">
+        <p class="get-title">Comunidade Próspera</p>
+        <p class="get-desc">Você tem acesso à comunidade MAP, profissionais do seu nicho compartilhando estratégias e fazendo conexões.</p>
+      </div>
+      <div class="get-item">
+        <p class="get-title">🎁 Bônus</p>
+        <p class="get-desc">Acesso a todos os meus recursos, eventos presenciais e programas avançados gravados durante os 6 meses que você estiver na mentoria.</p>
+      </div>
+    </div>
+
+    <div class="value-total">
+      <span class="value-total-label">Valor total que você recebe</span>
+      <span class="value-total-num">R$80.000</span>
+      <p class="value-total-sub">10 vagas para esse grupo / número limitado / acompanhamento real (eu e você).</p>
+    </div>
+  </section>
+
+  <hr class="sep">
+
+  <!-- ── INVESTIMENTO ── -->
+  <section class="price-section section-inner reveal">
+    <span class="sec-eyebrow">Investimento</span>
+    <p class="price-main">R$12.000</p>
+    <p class="price-installment">ou 12x de R$1.200</p>
+    <p class="price-note">O que é mais caro — continuar abaixo do seu potencial ou um valor que você recupera nos primeiros 21 dias?</p>
+  </section>
+
+  <hr class="sep">
+
+  <!-- ── COMO ENTRAR ── -->
+  <section class="section section-inner reveal">
+    <span class="sec-eyebrow">Como entrar</span>
+    <h2 class="sec-h2">Sem call de vendas. Sem follow-up. Sem insistência.</h2>
+
+    <div style="margin-top: 32px;">
+      <div class="entry-row">
+        <span class="entry-num">01</span>
+        <div>
+          <p class="entry-title">Você aplica</p>
+          <p class="entry-desc">Formulário curto com seu negócio atual, renda mensal e o problema principal.</p>
+        </div>
+      </div>
+      <div class="entry-row">
+        <span class="entry-num">02</span>
+        <div>
+          <p class="entry-title">Eu analiso</p>
+          <p class="entry-desc">Verifico se consigo te ajudar. Se não fizer sentido, eu digo diretamente.</p>
+        </div>
+      </div>
+      <div class="entry-row">
+        <span class="entry-num">03</span>
+        <div>
+          <p class="entry-title">Você recebe a proposta completa</p>
+          <p class="entry-desc">Se fizer sentido pra você, você garante uma das 10 vagas.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="sep">
+
+  <!-- ── CTA ── -->
+  <section class="cta-section section-inner reveal">
+    <p class="cta-note">Preencha o formulário. Eu analiso e respondo em até 48 horas.</p>
+    <a href="#" class="btn-apply">Aplicar para uma das 10 vagas</a>
+  </section>
+
+  <hr class="sep">
+
+  <!-- ── FILOSOFIA + CASES ── -->
+  <section class="philosophy-section section-inner reveal">
+    <span class="sec-eyebrow">O modelo que defendo</span>
+    <p class="philosophy-quote">"Eu construí a vida e o negócio que eu amo. É isso que eu vivo — é isso que eu ensino."</p>
+
+    <p style="font-family:'Space Grotesk',sans-serif; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:rgba(161,161,161,0.4); margin-bottom:24px;">Veja alguns cases que falam por mim:</p>
+
+    <!-- CASES — substitua pelos links/fotos reais -->
+    <div class="cases-grid">
+      <div class="case-placeholder"><img src="DSC01353-Enhanced-NR.jpg" alt="Case 1"></div>
+      <div class="case-placeholder"><img src="DSC01363-Enhanced-NR.jpg" alt="Case 2"></div>
+      <div class="case-placeholder"><img src="IMG_1553.jpg" alt="Case 3"></div>
+      <div class="case-placeholder"><img src="IMG_1661.jpg" alt="Case 4"></div>
+      <div class="case-placeholder"><img src="IMG_2241.jpg" alt="Case 5"></div>
+      <div class="case-placeholder"><img src="IMG_2354.jpg" alt="Case 6"></div>
+      <div class="case-placeholder"><img src="IMG_2684-Enhanced-NR.jpg" alt="Case 7"></div>
+      <div class="case-placeholder"><img src="IMG_3059.jpg" alt="Case 8"></div>
+      <div class="case-placeholder"><img src="IMG_3130.jpg" alt="Case 9"></div>
+      <div class="case-placeholder"><img src="IMG_8624.jpg" alt="Case 10"></div>
+      <div class="case-placeholder"><img src="IMG_8752.jpg" alt="Case 11"></div>
+      <div class="case-placeholder"><img src="Isa%20Ribeiro.jpg" alt="Case 12"></div>
+      <div class="case-placeholder"><img src="Lari%20Colebrusco.jpg" alt="Case 13"></div>
+    </div>
+  </section>
+
+  <hr class="sep">
+
+  <!-- ── PS ── -->
+  <section class="ps-section section-inner reveal">
+    <p class="ps-text">Prosperidade é uma frequência!<br><br>Engineered by Ádamo Peçanha</p>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer class="footer">
+    <p>© Ádamo Peçanha — Todos os direitos reservados</p>
+  </footer>
+
+</div>
+
+<script>
+  const els = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.08, rootMargin: '0px 0px -32px 0px' });
+  els.forEach(el => io.observe(el));
+</script>
+</body>
+</html>
